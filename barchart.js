@@ -18,7 +18,7 @@ $(document).ready(() => {
             console.log(dataset);
             const svg = d3.select("#demo")
                   .append("svg")
-                  .attr("width", w + m.left + m.right)
+                  .attr("width", w + m.left + m.right*2)
                   .attr("height", h + m.top + m.bottom);
 
             //Translating axises to accomodate for margin.If we don't, ticks and numbers would look cut of.
@@ -68,18 +68,115 @@ $(document).ready(() => {
             
             //Appending x axis to chart.
             g.append("g")
-                .attr("transform", "translate(0, "+ h +")")
+                .attr("transform", "translate("+m.left+", "+ h +")")
                 .attr("class", "tick axis")
                 .attr("id", "x-axis")
                 .call(xAxis);
 
             //Appending y axis to chart.
             g.append("g")
-                .attr("transform", "translate(0, 0)")
+                .attr("transform", "translate("+m.left+", 0)")
                 .attr("class", "tick axis")
                 .attr("id", "y-axis")
                 .attr("fill", "red")
                 .call(yAxis);
+
+            //Creating tooltip element.
+            const tooltip = d3.select('#demo')
+                .append('div')
+                .attr('id', 'tooltip')
+                .style('opacity', 0);
+
+            svg.selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("class", "dot")
+                .attr("data-xvalue", (d,i) => {
+                    //Setting data-date attribute with value.
+                    return d.Year;
+                })
+                .attr("data-yvalue", (d,i) => {
+                    //Setting data-gdp attribute with value.
+                    let timeArr = d.Time.split(':');
+                    let time1 = new Date(1970, 0, 1, 0, timeArr[0], timeArr[1]);
+                    return time1;
+                })
+                .attr("cx", (d, i) => xScale(d.Year) + m.left*2)
+                .attr("cy", (d, i) => {
+                    let timeArr = d.Time.split(':');
+                    let time1 = new Date(1970, 0, 1, 0, timeArr[0], timeArr[1]);
+                    return yScale(time1) + m.top;
+
+                })
+                .attr("r", 5)
+                //Setting tooltip made from absolutely positioned div.
+                .on('mouseover', (d, i) => {
+                    tooltip.style('opacity', 0.5);
+                    tooltip.html("<div>"+d.Name+": "+d.Nationality+"</div><div style='margin-bottom: 5px;'>Year: "+d.Year+", Time: "+d.Time+"</div><div>"+d.Year+" "+d.Doping+"</div>");
+                    tooltip.attr("data-year", d.Year);
+                    
+
+                })
+                .on('mouseout', (d) => {
+                    tooltip.style('opacity', 0);
+                });
+
+                //Draw the Doping Label:
+                svg.append("text")
+                    .attr("id", "title")
+                    .attr("class", "headline")
+                    .attr("x", w / 2)
+                    .attr("y", m.top)
+                    .attr("font-family", "sans-serif")
+                    .attr("fill", "green")
+                    .attr("text-anchor", "middle")
+                    .text("Doping in Professional Bicycle Racing"); 
+
+                //Draw the Minutes side Label:
+                svg.append("text")
+                    .attr("class", "headline1")
+                    .attr("x", w / 3.6)
+                    .attr("y", h / 2.8)
+                    .attr("transform", "translate(-180,530) rotate(-90)")
+                    .attr("font-family", "sans-serif")
+                    .attr("fill", "green")
+                    .attr("text-anchor", "middle")
+                    .text("Time in Minutes");
+
+                //Draw the Legend Label:
+                /*svg.append("text")
+                    .attr("id", "legend")
+                    .attr("class", "headline")
+                    .attr("x", w)
+                    .attr("y", h / 2)
+                    .attr("font-family", "sans-serif")
+                    .text("<div style='color: red;'>blah</div>"); */
+
+                    //style='position: absolute; top: 50%; left: 50%; z-index: 999;'
+                    d3.select("#demo")
+                    .append('div')
+                    .attr('id', 'legend')
+                    .attr("font-family", "sans-serif")
+                    .html("<div style='display: block; font-size: 8px;'><div style='display: inline-block;'>No doping allegations</div><div style='display: inline-block; width: 20px; height: 20px; border-radius: 2px; margin-left: 3px; background-color: navy;'></div></div> </br> <div style='display: block; font-size: 8px;'><div style='display: inline-block;'>Riders with doping allegations</div><div style='display: inline-block; width: 20px; height: 20px; border-radius: 2px; margin-left: 3px; background-color: orange;'></div></div>");
+
+                    let elem = document.getElementById("legend");
+                    elem.style.position = "absolute";
+                    elem.style.top = (h / 2) + "px";
+                    elem.style.left = w + (m.left * 2) + "px";
+
+                document.addEventListener("mouseover", (e) => {
+
+                    if(e.target.className.baseVal === "dot"){
+                        
+                        let xVal = e.target.cx.baseVal.value;
+                        let yVal = e.target.cy.baseVal.value;
+                        tooltip.style("left", xVal + 40 + "px");
+                        tooltip.style("top", yVal - 20 + "px");
+
+                    }
+                    
+                });
 
         },
         error: (xhr, ajaxOptions, thrownError) => {
