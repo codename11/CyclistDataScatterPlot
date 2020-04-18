@@ -12,7 +12,7 @@ $(document).ready(() => {
             const h = 600;
             
             //Margin to be set between chart and outher container.
-            const m = { top: 40, right: 40, bottom: 40, left: 40 };
+            const m = { top: 80, right: 40, bottom: 40, left: 40 };
 
             //Getting data.
             console.log(dataset);
@@ -37,12 +37,12 @@ $(document).ready(() => {
 
             //Calculating first year in dataset.
             let minYear = d3.min(years, (d) => {
-                return d-1;
+                return d-1;//Compensating.
             });
 
             //Calculating last year in dataset.
             let maxYear = d3.max(years, (d) => {
-                return d+1;
+                return d+1;//Compensating.
             });
             
             //Setting x axis.
@@ -93,11 +93,11 @@ $(document).ready(() => {
                 .append("circle")
                 .attr("class", "dot")
                 .attr("data-xvalue", (d,i) => {
-                    //Setting data-date attribute with value.
+                    //Setting data-xvalue attribute with value.
                     return d.Year;
                 })
                 .attr("data-yvalue", (d,i) => {
-                    //Setting data-gdp attribute with value.
+                    //Setting data-yvalue attribute with value.
                     let timeArr = d.Time.split(':');
                     let time1 = new Date(1970, 0, 1, 0, timeArr[0], timeArr[1]);
                     return time1;
@@ -112,10 +112,10 @@ $(document).ready(() => {
                 .attr("r", 5)
                 //Setting tooltip made from absolutely positioned div.
                 .on('mouseover', (d, i) => {
+
                     tooltip.style('opacity', 0.5);
                     tooltip.html("<div>"+d.Name+": "+d.Nationality+"</div><div style='margin-bottom: 5px;'>Year: "+d.Year+", Time: "+d.Time+"</div><div>"+d.Year+" "+d.Doping+"</div>");
                     tooltip.attr("data-year", d.Year);
-                    
 
                 })
                 .on('mouseout', (d) => {
@@ -127,11 +127,22 @@ $(document).ready(() => {
                     .attr("id", "title")
                     .attr("class", "headline")
                     .attr("x", w / 2)
-                    .attr("y", m.top)
+                    .attr("y", m.top/2)
                     .attr("font-family", "sans-serif")
                     .attr("fill", "green")
                     .attr("text-anchor", "middle")
                     .text("Doping in Professional Bicycle Racing"); 
+
+                //Draw the Doping Sub-Label:
+                svg.append("text")
+                    .attr("id", "title")
+                    .attr("class", "headline1")
+                    .attr("x", w / 2)
+                    .attr("y", m.top/1.3)
+                    .attr("font-family", "sans-serif")
+                    .attr("fill", "green")
+                    .attr("text-anchor", "middle")
+                    .text("35 Fastest times up Alpe d'Huez");
 
                 //Draw the Minutes side Label:
                 svg.append("text")
@@ -144,26 +155,16 @@ $(document).ready(() => {
                     .attr("text-anchor", "middle")
                     .text("Time in Minutes");
 
-                //Draw the Legend Label:
-                /*svg.append("text")
-                    .attr("id", "legend")
-                    .attr("class", "headline")
-                    .attr("x", w)
-                    .attr("y", h / 2)
-                    .attr("font-family", "sans-serif")
-                    .text("<div style='color: red;'>blah</div>"); */
-
-                    //style='position: absolute; top: 50%; left: 50%; z-index: 999;'
-                    d3.select("#demo")
-                    .append('div')
+                d3.select("#demo")
+                    .append('table')
                     .attr('id', 'legend')
                     .attr("font-family", "sans-serif")
-                    .html("<div style='display: block; font-size: 8px;'><div style='display: inline-block;'>No doping allegations</div><div style='display: inline-block; width: 20px; height: 20px; border-radius: 2px; margin-left: 3px; background-color: navy;'></div></div> </br> <div style='display: block; font-size: 8px;'><div style='display: inline-block;'>Riders with doping allegations</div><div style='display: inline-block; width: 20px; height: 20px; border-radius: 2px; margin-left: 3px; background-color: orange;'></div></div>");
+                    .html("<tr><td>No doping allegations</td><td class='dop'></td></tr> <tr><td>Riders with doping allegations</td><td class='nodop'></td></tr>");
 
                     let elem = document.getElementById("legend");
                     elem.style.position = "absolute";
                     elem.style.top = (h / 2) + "px";
-                    elem.style.left = w + (m.left * 2) + "px";
+                    elem.style.left = w - (m.left * 3) + "px";
 
                 document.addEventListener("mouseover", (e) => {
 

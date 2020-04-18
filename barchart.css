@@ -43,3 +43,19 @@ rect{
     margin-left: auto;
     margin-right: auto;
 }
+
+.nodop{
+    background-color: navy;
+    width: 20px;
+    height: 20px;
+}
+
+.dop{
+    background-color: orange;
+    width: 20px;
+    height: 20px;
+}
+
+table{
+  border-spacing: 10px;
+}
