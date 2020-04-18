@@ -92,6 +92,11 @@ $(document).ready(() => {
                 .enter()
                 .append("circle")
                 .attr("class", "dot")
+                .attr("fill", (d, i) => {
+
+                    return d.Doping === "" ? "orange" : "navy";
+
+                })
                 .attr("data-xvalue", (d,i) => {
                     //Setting data-xvalue attribute with value.
                     return d.Year;
