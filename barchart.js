@@ -93,7 +93,7 @@ $(document).ready(() => {
                 .append("circle")
                 .attr("class", "dot")
                 .attr("fill", (d, i) => {
-
+                    //Distinction between doping and no doping dots.
                     return d.Doping === "" ? "orange" : "navy";
 
                 })
